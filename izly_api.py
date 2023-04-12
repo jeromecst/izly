@@ -3,7 +3,7 @@ import re
 from bs4 import BeautifulSoup
 
 
-def get_csrf() -> tuple[dict, str]:
+def get_csrf():
     """
     get the csrf token and the cookies to use in next requests
 
@@ -20,7 +20,7 @@ def get_csrf() -> tuple[dict, str]:
     return login_form.cookies, soup.find("input", {"name": "__RequestVerificationToken"})["value"]
 
 
-def get_credentials(cookies: dict, csrf: str, username: str, password: str) -> dict:
+def get_credentials(cookies: dict, csrf: str, username: str, password: str):
     """
     get the credentials of the izly account to perform actions as the user
 
@@ -56,7 +56,7 @@ def get_credentials(cookies: dict, csrf: str, username: str, password: str) -> d
     return cookies
 
 
-def get_qrcode(credentials: dict, codes: int = 1) -> list:
+def get_qrcode(credentials: dict, codes: int = 1):
     """
     get the qr-code of the izly account
 
@@ -85,7 +85,7 @@ def get_qrcode(credentials: dict, codes: int = 1) -> list:
     return base_codes.json()
 
 
-def get_balance(credentials: dict) -> list:
+def get_balance(credentials: dict):
     """
     get the qr-code of the izly account
 
