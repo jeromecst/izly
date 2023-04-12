@@ -23,30 +23,35 @@ def index():
         # Get the username and password from the form
         username = request.form['username']
         password = request.form['password']
+        request_type = request.form['button']
 
-        # Generate the QR code from Izly
         credentials = izly_api.get_credentials(*izly_api.get_csrf(), username, password)
-        base64_qrcodes = izly_api.get_qrcode(credentials)[0]
-        base64_image = str(re.search(r"base64,(.*)", base64_qrcodes["Src"]).group(1))
-        img_bytes = base64.b64decode(base64_image)
+        if request_type == 'qr':
+            # Generate the QR code from Izly
+            base64_qrcodes = izly_api.get_qrcode(credentials)[0]
+            base64_image = str(re.search(r"base64,(.*)", base64_qrcodes["Src"]).group(1))
+            img_bytes = base64.b64decode(base64_image)
 
-        # Decode the QR code
-        image = Image.open(io.BytesIO(img_bytes))
-        decoded_data = decode(image)[0].data.decode("utf-8")
+            # Decode the QR code
+            image = Image.open(io.BytesIO(img_bytes))
+            decoded_data = decode(image)[0].data.decode("utf-8")
 
-        # Add data to the QR code instance
-        qr.add_data(decoded_data)
-        qr.make(fit=True)
+            # Add data to the QR code instance
+            qr.add_data(decoded_data)
+            qr.make(fit=True)
 
-        # Generate the QR code image
-        img = qr.make_image(fill_color="black", back_color="white")
+            # Generate the QR code image
+            img = qr.make_image(fill_color="black", back_color="white")
 
-        byte_buffer = io.BytesIO()
-        img.save(byte_buffer, format="PNG")
-        qr_code_bytes = byte_buffer.getvalue()
+            byte_buffer = io.BytesIO()
+            img.save(byte_buffer, format="PNG")
+            qr_code_bytes = byte_buffer.getvalue()
 
-        # Return the QR code as an image
-        return qr_code_bytes, 200, {'Content-Type': 'image/png'}
+            # Return the QR code as an image
+            return qr_code_bytes, 200, {'Content-Type': 'image/png'}
+        elif request_type == 'balance':
+            balance = str(izly_api.get_balance(credentials))
+            return render_template('balance.html', value=balance)
     else:
         # If the request is a GET request, return the HTML form
         return render_template('index.html')
